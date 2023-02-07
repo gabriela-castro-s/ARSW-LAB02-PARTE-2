@@ -48,23 +48,29 @@ public class Snake extends Observable implements Runnable {
     @Override
     public void run() {
         while (!snakeEnd) {
-            
-            snakeCalc();
-
-            //NOTIFY CHANGES TO GUI
-            setChanged();
-            notifyObservers();
-
-            try {
-                if (hasTurbo == true) {
-                    Thread.sleep(500 / 3);
-                } else {
-                    Thread.sleep(500);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            synchronized (snakeBody) {
+                head = snakeBody.peekFirst();
             }
+            newCell = head;
+            newCell = changeDirection(newCell);
+            randomMovement(newCell);
+            synchronized (newCell) {
+                snakeCalc();
 
+                //NOTIFY CHANGES TO GUI
+                setChanged();
+                notifyObservers();
+
+                try {
+                    if (hasTurbo == true) {
+                        Thread.sleep(500 / 3);
+                    } else {
+                        Thread.sleep(500);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         
         fixDirection(head);
@@ -73,27 +79,21 @@ public class Snake extends Observable implements Runnable {
     }
 
     private void snakeCalc() {
-        head = snakeBody.peekFirst();
-
-        newCell = head;
-
-        newCell = changeDirection(newCell);
-        
-        randomMovement(newCell);
-
         checkIfFood(newCell);
         checkIfJumpPad(newCell);
         checkIfTurboBoost(newCell);
         checkIfBarrier(newCell);
-        
-        snakeBody.push(newCell);
 
-        if (growing <= 0) {
-            newCell = snakeBody.peekLast();
-            snakeBody.remove(snakeBody.peekLast());
-            Board.gameboard[newCell.getX()][newCell.getY()].freeCell();
-        } else if (growing != 0) {
-            growing--;
+        synchronized (snakeBody){
+            snakeBody.push(newCell);
+
+            if (growing <= 0) {
+                newCell = snakeBody.peekLast();
+                snakeBody.remove(snakeBody.peekLast());
+                Board.gameboard[newCell.getX()][newCell.getY()].freeCell();
+            } else if (growing != 0) {
+                growing--;
+            }
         }
 
     }

@@ -92,6 +92,14 @@ public class SnakeApp {
             }
         }
 
+        for(int i=0; i<snakes.length; i++){
+            try {
+                thread[i].join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SnakeApp.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
 
         System.out.println("Thread (snake) status:");
         for (int i = 0; i != MAX_THREADS; i++) {
