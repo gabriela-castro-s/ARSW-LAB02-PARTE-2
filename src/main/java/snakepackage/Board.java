@@ -117,7 +117,7 @@ public class Board extends JLabel implements Observer {
 
 	private void drawTurboBoosts(Graphics g) {
 		Image light = null;
-		InputStream resource=ClassLoader.getSystemResourceAsStream("Img/lightning.png");
+		InputStream resource=getClass().getClassLoader().getResourceAsStream("Img/lightning.png");
 		try {
 			light = ImageIO.read(resource);
 		} catch (IOException e) {
